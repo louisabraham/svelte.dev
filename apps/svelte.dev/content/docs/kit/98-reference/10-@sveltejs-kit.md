@@ -2779,7 +2779,9 @@ interface Socket {/*…*/}
 <div class="ts-block-property">
 
 ```dts
-upgrade?: (request: RequestEvent) => MaybePromise<Response | ResponseInit | void>;
+upgrade?: (
+	request: RequestEvent & { context: import('crossws').Peer['context'] }
+) => MaybePromise<Response | ResponseInit | void>;
 ```
 
 <div class="ts-block-property-details">

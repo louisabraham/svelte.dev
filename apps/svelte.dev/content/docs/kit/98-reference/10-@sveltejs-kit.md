@@ -2779,7 +2779,7 @@ interface Socket {/*…*/}
 
 ```dts
 upgrade?: (
-	request: RequestEvent & { context: import('crossws').Peer['context'] }
+	event: RequestEvent & { context: import('crossws').Peer['context'] }
 ) => MaybePromise<Response | ResponseInit | void>;
 ```
 
@@ -2824,7 +2824,7 @@ close?: import('crossws').Hooks['close'];
 
 <div class="ts-block-property-details">
 
-A socket is closed
+A socket is closed.
 
 </div>
 </div>
@@ -2837,7 +2837,7 @@ error?: import('crossws').Hooks['error'];
 
 <div class="ts-block-property-details">
 
-An error occurs.
+A WebSocket error occurs.
 
 </div>
 </div></div>

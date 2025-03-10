@@ -12,6 +12,12 @@ import { getPeers, publish, read } from '$app/server';
 
 ## getPeers
 
+<blockquote class="since note">
+
+Available since 2.19.0
+
+</blockquote>
+
 Returns a set of connected WebSocket peers.
 See [Peer](https://crossws.unjs.io/guide/peer) for more information.
 
@@ -36,6 +42,12 @@ function getPeers(): import('crossws').AdapterInstance['peers'];
 
 
 ## publish
+
+<blockquote class="since note">
+
+Available since 2.19.0
+
+</blockquote>
 
 Send a message to WebSocket peer subscribers of a given topic.
 See [Pub / Sub](https://crossws.unjs.io/guide/pubsub) for more information.
@@ -73,7 +85,7 @@ Available since 2.4.0
 
 </blockquote>
 
-Read the contents of an imported asset from the filesystem
+Read the contents of an imported asset from the filesystem.
 
 ```js
 // @errors: 7031

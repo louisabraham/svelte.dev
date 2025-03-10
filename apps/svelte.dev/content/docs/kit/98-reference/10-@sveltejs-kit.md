@@ -55,6 +55,19 @@ respond(request: Request, options: RequestOptions): Promise<Response>;
 ```
 
 <div class="ts-block-property-details"></div>
+</div>
+
+<div class="ts-block-property">
+
+```dts
+getWebSocketHooksResolver(
+	options: RequestOptions
+): (
+	info: RequestInit | import('crossws').Peer
+) => Promise<Partial<import('crossws').Hooks> & { upgrade: import('crossws').Hooks['upgrade'] }>;
+```
+
+<div class="ts-block-property-details"></div>
 </div></div>
 
 
@@ -1477,6 +1490,12 @@ type LoadProperties<
 
 ## Message
 
+<blockquote class="since note">
+
+Available since 2.19.0
+
+</blockquote>
+
 During a [WebSocket](/docs/kit/websockets) `message` hook, you receive a `message` object containing data from the client.
 See [Message](https://crossws.unjs.io/guide/message) for more information.
 
@@ -1917,6 +1936,12 @@ type ParamMatcher = (param: string) => boolean;
 </div>
 
 ## Peer
+
+<blockquote class="since note">
+
+Available since 2.19.0
+
+</blockquote>
 
 When a new [WebSocket](/docs/kit/websockets) client connects to the server, `crossws` creates a `peer` instance that allows getting information from clients and sending messages to them.
 See [Peer](https://crossws.unjs.io/guide/peer) for more information.
@@ -2513,49 +2538,6 @@ type ServerInit = () => MaybePromise<void>;
 
 </div>
 
-<div class="ts-block-property">
-
-```dts
-init(options: ServerInitOptions): Promise<void>;
-```
-
-<div class="ts-block-property-details"></div>
-</div>
-
-<div class="ts-block-property">
-
-```dts
-respond(request: Request, options: RequestOptions): Promise<Response>;
-```
-
-<div class="ts-block-property-details"></div>
-</div>
-
-<div class="ts-block-property">
-
-```dts
-getWebSocketHooksResolver(
-	options: RequestOptions
-): (
-	info: RequestInit | import('crossws').Peer
-) => Promise<Partial<import('crossws').Hooks> & { upgrade: import('crossws').Hooks['upgrade'] }>;
-```
-
-<div class="ts-block-property-details"></div>
-</div></div>
-
-## ServerInit
-
-The [`init`](/docs/kit/hooks#Shared-hooks-init) will be invoked before the server responds to its first request
-
-<div class="ts-block">
-
-```dts
-type ServerInit = () => MaybePromise<void>;
-```
-
-</div>
-
 ## ServerInitOptions
 
 <div class="ts-block">
@@ -2777,6 +2759,12 @@ restore: (snapshot: T) => void;
 </div></div>
 
 ## Socket
+
+<blockquote class="since note">
+
+Available since 2.19.0
+
+</blockquote>
 
 Shape of the `export const socket = {...}` object in `+server.js`.
 See [WebSockets](/docs/kit/websockets) for more information.

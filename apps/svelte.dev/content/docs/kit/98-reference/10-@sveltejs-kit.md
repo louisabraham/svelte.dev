@@ -2247,6 +2247,7 @@ The [`reroute`](/docs/kit/hooks#Universal-hooks-reroute) hook allows you to modi
 ```dts
 type Reroute = (event: {
 	url: URL;
+	fetch: typeof fetch;
 }) => MaybePromise<void | string>;
 ```
 

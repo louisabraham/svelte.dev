@@ -60,11 +60,10 @@ respond(request: Request, options: RequestOptions): Promise<Response>;
 <div class="ts-block-property">
 
 ```dts
-getWebSocketHooksResolver(
+resolveWebSocketHooks(
+	request: Request,
 	options: RequestOptions
-): (
-	info: RequestInit | import('crossws').Peer
-) => Promise<Partial<import('crossws').Hooks> & { upgrade: import('crossws').Hooks['upgrade'] }>;
+): Promise<Partial<import('crossws').Hooks>>;
 ```
 
 <div class="ts-block-property-details"></div>

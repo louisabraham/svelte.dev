@@ -34,7 +34,7 @@ peers.forEach((peer) => {
 <div class="ts-block">
 
 ```dts
-function getPeers(): any['peers'];
+function getPeers(): import('crossws').AdapterInstance['peers'];
 ```
 
 </div>

@@ -14,7 +14,7 @@ import { getPeers, publish, read } from '$app/server';
 
 <blockquote class="since note">
 
-Available since 2.19.0
+Available since 2.20.0
 
 </blockquote>
 
@@ -34,7 +34,7 @@ peers.forEach((peer) => {
 <div class="ts-block">
 
 ```dts
-function getPeers(): import('crossws').AdapterInstance['peers'];
+function getPeers(): any['peers'];
 ```
 
 </div>
@@ -45,7 +45,7 @@ function getPeers(): import('crossws').AdapterInstance['peers'];
 
 <blockquote class="since note">
 
-Available since 2.19.0
+Available since 2.20.0
 
 </blockquote>
 

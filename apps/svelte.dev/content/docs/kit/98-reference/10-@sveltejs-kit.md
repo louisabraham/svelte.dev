@@ -1169,7 +1169,7 @@ type HandleClientError = (input: {
 
 ## HandleFetch
 
-The [`handleFetch`](/docs/kit/hooks#Server-hooks-handleFetch) hook allows you to modify (or replace) a `fetch` request that happens inside a `load` function that runs on the server (or during pre-rendering)
+The [`handleFetch`](/docs/kit/hooks#Server-hooks-handleFetch) hook allows you to modify (or replace) a `fetch` request that happens inside a `load` function that runs on the server (or during pre-rendering).
 
 <div class="ts-block">
 
@@ -1495,8 +1495,9 @@ Available since 2.20.0
 
 </blockquote>
 
-During a [WebSocket](/docs/kit/websockets) `message` hook, you'll receive a `message` object containing data from the client.
-See [Message](https://crossws.unjs.io/guide/message) for more information.
+During a WebSocket [`message`](/docs/kit/websockets#Hooks-message)
+hook, you'll receive a [`Message`](https://crossws.unjs.io/guide/message)
+object containing data from the client.
 
 <div class="ts-block">
 
@@ -1942,8 +1943,9 @@ Available since 2.20.0
 
 </blockquote>
 
-When a new [WebSocket](/docs/kit/websockets) client connects to the server, `crossws` creates a `Peer` instance that allows getting information from clients and sending messages to them.
-See [Peer](https://crossws.unjs.io/guide/peer) for more information.
+When a new [WebSocket](/docs/kit/websockets) client connects
+to the server, `crossws` creates a [`Peer`](https://crossws.unjs.io/guide/peer)
+object that allows interacting with the connected client.
 
 <div class="ts-block">
 
@@ -2732,7 +2734,16 @@ export async function load({ untrack, url }) {
 
 ## Snapshot
 
-The type of `export const snapshot` exported from a page or layout component.
+<blockquote class="since note">
+
+Available since 1.5.0
+
+</blockquote>
+
+Shape of the `export const snapshot = {...}` object in a page or layout component.
+You should import these from `./$types` (see [generated types](/docs/kit/types#Generated-types))
+rather than using `Snapshot` directly.
+See [snapshots](/docs/kit/snapshots) for more information.
 
 <div class="ts-block">
 
@@ -2785,7 +2796,7 @@ upgrade?: (
 
 <div class="ts-block-property-details">
 
-The [upgrade](/docs/kit/websockets#upgrade) hook runs every time a request is attempting to upgrade to a WebSocket connection.
+The [upgrade](/docs/kit/websockets#Hooks-upgrade) hook runs every time a request is attempting to upgrade to a WebSocket connection.
 
 </div>
 </div>
@@ -2798,7 +2809,7 @@ open?: import('crossws').Hooks['open'];
 
 <div class="ts-block-property-details">
 
-The [open](/docs/kit/websockets#open) hook runs every time a WebSocket connection is opened.
+The [open](/docs/kit/websockets#Hooks-open) hook runs every time a WebSocket connection is opened.
 
 </div>
 </div>
@@ -2811,7 +2822,7 @@ message?: import('crossws').Hooks['message'];
 
 <div class="ts-block-property-details">
 
-The [message](/docs/kit/websockets#message) hook runs every time a message is received from a WebSocket client.
+The [message](/docs/kit/websockets#Hooks-message) hook runs every time a message is received from a WebSocket client.
 
 </div>
 </div>
@@ -2824,7 +2835,7 @@ close?: import('crossws').Hooks['close'];
 
 <div class="ts-block-property-details">
 
-The [close](/docs/kit/websockets#close) hook runs every time a WebSocket connection is closed.
+The [close](/docs/kit/websockets#Hooks-close) hook runs every time a WebSocket connection is closed.
 
 </div>
 </div>
@@ -2837,7 +2848,7 @@ error?: import('crossws').Hooks['error'];
 
 <div class="ts-block-property-details">
 
-The [error](/docs/kit/websockets#error) hook runs every time a WebSocket error occurs.
+The [error](/docs/kit/websockets#Hooks-error) hook runs every time a WebSocket error occurs.
 
 </div>
 </div></div>

@@ -1495,7 +1495,7 @@ Available since 2.19.0
 
 </blockquote>
 
-During a [WebSocket](/docs/kit/websockets) `message` hook, you receive a `message` object containing data from the client.
+During a [WebSocket](/docs/kit/websockets) `message` hook, you'll receive a `message` object containing data from the client.
 See [Message](https://crossws.unjs.io/guide/message) for more information.
 
 <div class="ts-block">
@@ -1942,7 +1942,7 @@ Available since 2.19.0
 
 </blockquote>
 
-When a new [WebSocket](/docs/kit/websockets) client connects to the server, `crossws` creates a `peer` instance that allows getting information from clients and sending messages to them.
+When a new [WebSocket](/docs/kit/websockets) client connects to the server, `crossws` creates a `Peer` instance that allows getting information from clients and sending messages to them.
 See [Peer](https://crossws.unjs.io/guide/peer) for more information.
 
 <div class="ts-block">
@@ -2785,20 +2785,7 @@ upgrade?: (
 
 <div class="ts-block-property-details">
 
-Upgrading.
-
-</div>
-</div>
-
-<div class="ts-block-property">
-
-```dts
-message?: import('crossws').Hooks['message'];
-```
-
-<div class="ts-block-property-details">
-
-A message is received.
+The [upgrade](/docs/kit/websockets#upgrade) hook runs every time a request is attempting to upgrade to a WebSocket connection.
 
 </div>
 </div>
@@ -2811,7 +2798,20 @@ open?: import('crossws').Hooks['open'];
 
 <div class="ts-block-property-details">
 
-A socket is opened.
+The [open](/docs/kit/websockets#open) hook runs every time a WebSocket connection is opened.
+
+</div>
+</div>
+
+<div class="ts-block-property">
+
+```dts
+message?: import('crossws').Hooks['message'];
+```
+
+<div class="ts-block-property-details">
+
+The [message](/docs/kit/websockets#message) hook runs every time a message is received from a WebSocket client.
 
 </div>
 </div>
@@ -2824,7 +2824,7 @@ close?: import('crossws').Hooks['close'];
 
 <div class="ts-block-property-details">
 
-A socket is closed.
+The [close](/docs/kit/websockets#close) hook runs every time a WebSocket connection is closed.
 
 </div>
 </div>
@@ -2837,7 +2837,7 @@ error?: import('crossws').Hooks['error'];
 
 <div class="ts-block-property-details">
 
-A WebSocket error occurs.
+The [error](/docs/kit/websockets#error) hook runs every time a WebSocket error occurs.
 
 </div>
 </div></div>

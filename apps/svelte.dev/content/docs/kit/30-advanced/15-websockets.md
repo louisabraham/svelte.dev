@@ -32,7 +32,7 @@ export const socket = {
 
 ### upgrade
 
-The `upgrade` hook is called before a WebSocket connection is established. It takes a [RequestEvent](@sveltejs-kit#RequestEvent) argument.
+The `upgrade` hook is called before a WebSocket connection is established. It receives a [RequestEvent](@sveltejs-kit#RequestEvent) object that has an additional [`context`](https://crossws.unjs.io/guide/peer#peercontext) property to store abitrary information that is shared with that connection's [`Peer`](https://crossws.unjs.io/guide/peer) object.
 
 You can use the [`error`](@sveltejs-kit#error) function imported from `@sveltejs/kit` to easily reject connections. Requests will be auto-accepted if the `upgrade` hook is not defined or does not `error`.
 
@@ -42,7 +42,7 @@ import { error } from "@sveltejs/kit";
 /** @type {import('@sveltejs/kit').Socket} **/
 export const socket = {
 	upgrade({ request }) {
-		if (request.headers.get('origin') !== 'allowed_origin') {
+		if (request.headers.get('origin') !== 'my_allowed_origin') {
 			// Reject the WebSocket connection by throwing an error
 			error(403, 'Forbidden');
 		}
@@ -52,7 +52,7 @@ export const socket = {
 
 ### open
 
-The `open` hook is called when a WebSocket connection is opened. It receives the [peer](https://crossws.unjs.io/guide/peer) object, to allow interacting with connected clients, as a parameter.
+The `open` hook is called when a WebSocket connection is opened. It receives a [Peer](https://crossws.unjs.io/guide/peer) object to allow interacting with connected clients.
 
 ```js
 /** @type {import('@sveltejs/kit').Socket} **/
@@ -65,7 +65,7 @@ export const socket = {
 
 ### message
 
-The `message` hook is called when a message is received from the client. It receives the [peer](https://crossws.unjs.io/guide/peer) object, to allow interacting with connected clients, and the [message](https://crossws.unjs.io/guide/message) object, containing data from the client, as parameters.
+The `message` hook is called when a message is received from the client. It receives the [Peer](https://crossws.unjs.io/guide/peer) object to allow interacting with connected clients and the [Message](https://crossws.unjs.io/guide/message) object which contains data from the client.
 
 ```js
 /** @type {import('@sveltejs/kit').Socket} **/
@@ -78,7 +78,7 @@ export const socket = {
 
 ### close
 
-The `close` hook is called when a WebSocket connection is closed. It receives the [peer](https://crossws.unjs.io/guide/peer) object, to allow interacting with connected clients, and the close event object, containing the [WebSocket connection close code](https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code#value) and reason, as parameters.
+The `close` hook is called when a WebSocket connection is closed. It receives the [Peer](https://crossws.unjs.io/guide/peer) object to allow interacting with connected clients and the close event object which contains the [WebSocket connection close code](https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code#value) and reason.
 
 ```js
 /** @type {import('@sveltejs/kit').Socket} **/
@@ -91,7 +91,7 @@ export const socket = {
 
 ### error
 
-The `error` hook is called when a connection with a WebSocket has been closed due to an error. It receives the [peer](https://crossws.unjs.io/guide/peer) object, to allow interacting with connected clients, and the error, as parameters.
+The `error` hook is called when a connection with a WebSocket has been closed due to an error. It receives the [Peer](https://crossws.unjs.io/guide/peer) object to allow interacting with connected clients and the error.
 
 ```js
 /** @type {import('@sveltejs/kit').Socket} **/
@@ -131,4 +131,4 @@ See [the WebSocket documentation on MDN](https://developer.mozilla.org/en-US/doc
 
 ## Compatibility
 
-Please refer to the crossws [`peer` object compatibility table](https://crossws.unjs.io/guide/peer#compatibility) and [`message` object compatibility table](https://crossws.unjs.io/guide/message#adapter-support) to know what is supported in different runtime environments.
+Please refer to the crossws [`Peer` object compatibility table](https://crossws.unjs.io/guide/peer#compatibility) and [`Message` object compatibility table](https://crossws.unjs.io/guide/message#adapter-support) to know what is supported in different runtime environments.

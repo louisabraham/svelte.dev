@@ -1137,44 +1137,7 @@ The drawback is that for unvisited paths, resolution will take slightly longer (
 
 <div class="ts-block-property-children">
 
-<div class="ts-block-property">
 
-```ts
-// @noErrors
-register?: boolean;
-```
-
-<div class="ts-block-property-details">
-
-<div class="ts-block-property-bullets">
-
-- <span class="tag">default</span> `true`
-
-</div>
-
-Whether to automatically register the service worker, if it exists.
-
-</div>
-</div>
-<div class="ts-block-property">
-
-```ts
-// @noErrors
-files?(filepath: string): boolean;
-```
-
-<div class="ts-block-property-details">
-
-<div class="ts-block-property-bullets">
-
-- <span class="tag">default</span> `(filename) => !/\.DS_Store/.test(filename)`
-
-</div>
-
-Determine which files in your `static` directory will be available in `$service-worker.files`.
-
-</div>
-</div>
 
 </div>
 

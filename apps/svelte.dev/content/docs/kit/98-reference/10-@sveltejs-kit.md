@@ -1643,7 +1643,7 @@ id: RouteId;
 
 <div class="ts-block-property-details">
 
-The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`
+The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`. It is `null` when no route is matched.
 
 </div>
 </div></div>
@@ -1691,12 +1691,25 @@ Is `null` if the target is not part of the SvelteKit app (could not be resolved 
 <div class="ts-block-property">
 
 ```dts
-route: { id: string | null };
+route: {/*…*/}
 ```
 
 <div class="ts-block-property-details">
 
 Info about the target route
+
+<div class="ts-block-property-children"><div class="ts-block-property">
+
+```dts
+id: string | null;
+```
+
+<div class="ts-block-property-details">
+
+The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`. It is `null` when no route is matched.
+
+</div>
+</div></div>
 
 </div>
 </div>
@@ -1850,7 +1863,7 @@ id: RouteId;
 
 <div class="ts-block-property-details">
 
-The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`.
+The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`. It is `null` when no route is matched.
 
 </div>
 </div></div>
@@ -2131,7 +2144,7 @@ id: RouteId;
 
 <div class="ts-block-property-details">
 
-The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`.
+The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`. It is `null` when no route is matched.
 
 </div>
 </div></div>

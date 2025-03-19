@@ -7,14 +7,14 @@ title: $app/server
 
 ```js
 // @noErrors
-import { getPeers, publish, read } from '$app/server';
+import { getPeers, getRequestEvent, publish, read } from '$app/server';
 ```
 
 ## getPeers
 
 <blockquote class="since note">
 
-Available since 2.20.0
+Available since 2.21.0
 
 </blockquote>
 
@@ -41,11 +41,36 @@ function getPeers(): import('crossws').AdapterInstance['peers'];
 
 
 
-## publish
+## getRequestEvent
 
 <blockquote class="since note">
 
 Available since 2.20.0
+
+</blockquote>
+
+Returns the current `RequestEvent`. Can be used inside `handle`, `load` and actions (and functions called by them).
+
+In environments without [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage), this must be called synchronously (i.e. not after an `await`).
+
+<div class="ts-block">
+
+```dts
+function getRequestEvent(): RequestEvent<
+	Partial<Record<string, string>>,
+	string | null
+>;
+```
+
+</div>
+
+
+
+## publish
+
+<blockquote class="since note">
+
+Available since 2.21.0
 
 </blockquote>
 

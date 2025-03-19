@@ -1491,7 +1491,7 @@ type LoadProperties<
 
 <blockquote class="since note">
 
-Available since 2.20.0
+Available since 2.21.0
 
 </blockquote>
 
@@ -1952,7 +1952,7 @@ type ParamMatcher = (param: string) => boolean;
 
 <blockquote class="since note">
 
-Available since 2.20.0
+Available since 2.21.0
 
 </blockquote>
 
@@ -2786,7 +2786,7 @@ restore: (snapshot: T) => void;
 
 <blockquote class="since note">
 
-Available since 2.20.0
+Available since 2.21.0
 
 </blockquote>
 

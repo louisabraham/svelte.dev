@@ -995,6 +995,29 @@ You must specify a `path` for the cookie. In most cases you should explicitly se
 <div class="ts-block-property">
 
 ```dts
+setFromString: (cookie: string) => void;
+```
+
+<div class="ts-block-property-details">
+
+<div class="ts-block-property-bullets">
+
+- `cookie` the cookie represented as string
+
+</div>
+
+Sets a cookie from a string. This will add a `set-cookie` header to the response, but also make the cookie available via `cookies.get` or `cookies.getAll` during the current request.
+
+No default values. It will set only properties you specified in a cookie.
+
+If you do not specify name, value and path, it will throw an error.
+
+</div>
+</div>
+
+<div class="ts-block-property">
+
+```dts
 delete: (name: string, opts: import('cookie').CookieSerializeOptions & { path: string }) => void;
 ```
 

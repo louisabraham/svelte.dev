@@ -2796,20 +2796,26 @@ See [WebSockets](/docs/kit/websockets) for more information.
 <div class="ts-block">
 
 ```dts
-interface Socket {/*…*/}
+interface Socket<
+	Params extends Partial<Record<string, string>> = Partial<
+		Record<string, string>
+	>,
+	RouteId extends string | null = string | null
+> {/*…*/}
 ```
 
 <div class="ts-block-property">
 
 ```dts
 upgrade?: (
-	event: RequestEvent & { context: import('crossws').Peer['context'] }
+	event: RequestEvent<Params, RouteId> & { context: import('crossws').Peer['context'] }
 ) => MaybePromise<Response | ResponseInit | void>;
 ```
 
 <div class="ts-block-property-details">
 
-The [upgrade](/docs/kit/websockets#Hooks-upgrade) hook runs every time a request is attempting to upgrade to a WebSocket connection.
+The [upgrade](/docs/kit/websockets#Hooks-upgrade) hook runs
+every time a request is attempting to upgrade to a WebSocket connection.
 
 </div>
 </div>
@@ -2822,7 +2828,8 @@ open?: import('crossws').Hooks['open'];
 
 <div class="ts-block-property-details">
 
-The [open](/docs/kit/websockets#Hooks-open) hook runs every time a WebSocket connection is opened.
+The [open](/docs/kit/websockets#Hooks-open) hook runs
+every time a WebSocket connection is opened.
 
 </div>
 </div>
@@ -2835,7 +2842,8 @@ message?: import('crossws').Hooks['message'];
 
 <div class="ts-block-property-details">
 
-The [message](/docs/kit/websockets#Hooks-message) hook runs every time a message is received from a WebSocket client.
+The [message](/docs/kit/websockets#Hooks-message) hook
+runs every time a message is received from a WebSocket client.
 
 </div>
 </div>
@@ -2848,7 +2856,8 @@ close?: import('crossws').Hooks['close'];
 
 <div class="ts-block-property-details">
 
-The [close](/docs/kit/websockets#Hooks-close) hook runs every time a WebSocket connection is closed.
+The [close](/docs/kit/websockets#Hooks-close) hook runs
+every time a WebSocket connection is closed.
 
 </div>
 </div>
@@ -2861,7 +2870,8 @@ error?: import('crossws').Hooks['error'];
 
 <div class="ts-block-property-details">
 
-The [error](/docs/kit/websockets#Hooks-error) hook runs every time a WebSocket error occurs.
+The [error](/docs/kit/websockets#Hooks-error) hook runs
+every time a WebSocket error occurs.
 
 </div>
 </div></div>

@@ -1502,7 +1502,15 @@ object containing data from the client.
 <div class="ts-block">
 
 ```dts
-type Message = import('crossws').Message;
+type Message<
+	Params extends Partial<Record<string, string>> = Partial<
+		Record<string, string>
+	>,
+	RouteId extends string | null = string | null
+> = import('crossws').Message & {
+	/** Access to the `Peer` that emitted the message. */
+	peer: Peer<Params, RouteId>;
+};
 ```
 
 </div>
@@ -1963,7 +1971,17 @@ object that allows interacting with the connected client.
 <div class="ts-block">
 
 ```dts
-type Peer = import('crossws').Peer;
+type Peer<
+	Params extends Partial<Record<string, string>> = Partial<
+		Record<string, string>
+	>,
+	RouteId extends string | null = string | null
+> = import('crossws').Peer & {
+	/** The original request object before upgrading to a WebSocket connection. */
+	request: Request;
+	/** Represents the initial request before upgrading to a WebSocket connection. */
+	event: RequestEvent<Params, RouteId>;
+};
 ```
 
 </div>
@@ -2823,7 +2841,7 @@ every time a request is attempting to upgrade to a WebSocket connection.
 <div class="ts-block-property">
 
 ```dts
-open?: import('crossws').Hooks['open'];
+open?: (peer: Peer<Params, RouteId>) => MaybePromise<void>;
 ```
 
 <div class="ts-block-property-details">
@@ -2837,7 +2855,7 @@ every time a WebSocket connection is opened.
 <div class="ts-block-property">
 
 ```dts
-message?: import('crossws').Hooks['message'];
+message?: (peer: Peer<Params, RouteId>, message: Message<Params, RouteId>) => MaybePromise<void>;
 ```
 
 <div class="ts-block-property-details">
@@ -2851,7 +2869,10 @@ runs every time a message is received from a WebSocket client.
 <div class="ts-block-property">
 
 ```dts
-close?: import('crossws').Hooks['close'];
+close?: (
+	peer: Peer<Params, RouteId>,
+	details: { code?: number; reason?: string }
+) => MaybePromise<void>;
 ```
 
 <div class="ts-block-property-details">
@@ -2865,7 +2886,7 @@ every time a WebSocket connection is closed.
 <div class="ts-block-property">
 
 ```dts
-error?: import('crossws').Hooks['error'];
+error?: (peer: Peer<Params, RouteId>, error: import('crossws').WSError) => MaybePromise<void>;
 ```
 
 <div class="ts-block-property-details">

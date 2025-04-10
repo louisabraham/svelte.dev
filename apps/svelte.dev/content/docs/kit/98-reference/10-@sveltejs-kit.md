@@ -1003,6 +1003,7 @@ setFromString: (cookie: string) => void;
 <div class="ts-block-property-bullets">
 
 - `cookie` the cookie represented as string
+- <span class="tag since">available since</span> v2.21.0
 
 </div>
 

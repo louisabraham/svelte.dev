@@ -28,7 +28,7 @@ A component is attempting to bind to a non-bindable property `%key%` belonging t
 ### component_api_changed
 
 ```
-%parent% called `%method%` on an instance of %component%, which is no longer valid in Svelte 5
+Calling `%method%` on a component instance (of %component%) is no longer valid in Svelte 5
 ```
 
 See the [migration guide](/docs/svelte/v5-migration-guide#Components-are-no-longer-classes) for more information.
@@ -158,6 +158,8 @@ This error occurs when state is updated while evaluating a `$derived`. You might
 This is forbidden because it introduces instability: if `<p>{count} is even: {even}</p>` is updated before `odd` is recalculated, `even` will be stale. In most cases the solution is to make everything derived:
 
 ```js
+let count = 0;
+// ---cut---
 let even = $derived(count % 2 === 0);
 let odd = $derived(!even);
 ```
@@ -211,6 +213,12 @@ This error would be thrown in a setup like this:
 ```
 
 Here, `List.svelte` is using `{@render children(item)` which means it expects `Parent.svelte` to use snippets. Instead, `Parent.svelte` uses the deprecated `let:` directive. This combination of APIs is incompatible, hence the error.
+
+### invalid_snippet_arguments
+
+```
+A snippet function was passed invalid arguments. Snippets should only be instantiated via `{@render ...}`
+```
 
 ### lifecycle_outside_component
 

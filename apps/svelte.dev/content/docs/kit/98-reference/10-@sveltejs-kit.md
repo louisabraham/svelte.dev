@@ -995,19 +995,19 @@ You must specify a `path` for the cookie. In most cases you should explicitly se
 <div class="ts-block-property">
 
 ```dts
-setFromString: (cookie: string) => void;
+setSerialized: (cookie: string) => void;
 ```
 
 <div class="ts-block-property-details">
 
 <div class="ts-block-property-bullets">
 
-- `cookie` the cookie represented as string
+- `cookie` the serialized cookie
 - <span class="tag since">available since</span> v2.21.0
 
 </div>
 
-Sets a cookie from a string. This will add a `set-cookie` header to the response, but also make the cookie available via `cookies.get` or `cookies.getAll` during the current request.
+Sets a cookie from a string representing the value of the `set-cookie` header. This will add the `set-cookie` header to the response, and also make the cookie available via `cookies.get` or `cookies.getAll` during the current request.
 
 No default values. It will set only properties you specified in a cookie.
 

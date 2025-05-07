@@ -12,9 +12,11 @@ import {
 	VERSION,
 	error,
 	fail,
+	isActionFailure,
 	isHttpError,
 	isRedirect,
 	json,
+	normalizeUrl,
 	redirect,
 	text
 } from '@sveltejs/kit';
@@ -125,6 +127,20 @@ function fail<
 
 
 
+## isActionFailure
+
+Checks whether this is an action failure thrown by `fail`.
+
+<div class="ts-block">
+
+```dts
+function isActionFailure(e: unknown): e is ActionFailure;
+```
+
+</div>
+
+
+
 ## isHttpError
 
 Checks whether this is an error thrown by `error`.
@@ -175,10 +191,51 @@ function json(
 
 
 
+## normalizeUrl
+
+<blockquote class="since note">
+
+Available since 2.18.0
+
+</blockquote>
+
+Strips possible SvelteKit-internal suffixes and trailing slashes from the URL pathname.
+Returns the normalized URL as well as a method for adding the potential suffix back
+based on a new pathname (possibly including search) or URL.
+```js
+// @errors: 7031
+import { normalizeUrl } from '@sveltejs/kit';
+
+const { url, denormalize } = normalizeUrl('/blog/post/__data.json');
+console.log(url.pathname); // /blog/post
+console.log(denormalize('/blog/post/a')); // /blog/post/a/__data.json
+```
+
+<div class="ts-block">
+
+```dts
+function normalizeUrl(url: URL | string): {
+	url: URL;
+	wasNormalized: boolean;
+	denormalize: (url?: string | URL) => URL;
+};
+```
+
+</div>
+
+
+
 ## redirect
 
 Redirect a request. When called during request handling, SvelteKit will return a redirect response.
 Make sure you're not catching the thrown redirect, which would prevent SvelteKit from handling it.
+
+Most common status codes:
+ * `303 See Other`: redirect as a GET request (often used after a form POST request)
+ * `307 Temporary Redirect`: redirect will keep the request method
+ * `308 Permanent Redirect`: redirect will keep the request method, SEO will be transferred to the new page
+
+[See all redirect status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status#redirection_messages)
 
 <div class="ts-block">
 
@@ -222,8 +279,8 @@ function text(
 
 ## Action
 
-Shape of a form action method that is part of `export const actions = {..}` in `+page.server.js`.
-See [form actions](https://kit.svelte.dev/docs/form-actions) for more information.
+Shape of a form action method that is part of `export const actions = {...}` in `+page.server.js`.
+See [form actions](/docs/kit/form-actions) for more information.
 
 <div class="ts-block">
 
@@ -313,8 +370,8 @@ type ActionResult<
 
 ## Actions
 
-Shape of the `export const actions = {..}` object in `+page.server.js`.
-See [form actions](https://kit.svelte.dev/docs/form-actions) for more information.
+Shape of the `export const actions = {...}` object in `+page.server.js`.
+See [form actions](/docs/kit/form-actions) for more information.
 
 <div class="ts-block">
 
@@ -335,7 +392,7 @@ type Actions<
 
 ## Adapter
 
-[Adapters](https://kit.svelte.dev/docs/adapters) are responsible for taking the production build and turning it into something that can be deployed to a platform of your choosing.
+[Adapters](/docs/kit/adapters) are responsible for taking the production build and turning it into something that can be deployed to a platform of your choosing.
 
 <div class="ts-block">
 
@@ -359,7 +416,7 @@ The name of the adapter, using for logging. Will typically correspond to the pac
 <div class="ts-block-property">
 
 ```dts
-adapt(builder: Builder): MaybePromise<void>;
+adapt: (builder: Builder) => MaybePromise<void>;
 ```
 
 <div class="ts-block-property-details">
@@ -383,7 +440,7 @@ supports?: {/*…*/}
 
 <div class="ts-block-property-details">
 
-Checks called during dev and build to determine whether specific features will work in production with this adapter
+Checks called during dev and build to determine whether specific features will work in production with this adapter.
 
 <div class="ts-block-property-children"><div class="ts-block-property">
 
@@ -395,11 +452,11 @@ read?: (details: { config: any; route: { id: string } }) => boolean;
 
 <div class="ts-block-property-bullets">
 
-- `config` The merged route config
+- `details.config` The merged route config
 
 </div>
 
-Test support for `read` from `$app/server`
+Test support for `read` from `$app/server`.
 
 </div>
 </div></div>
@@ -410,20 +467,20 @@ Test support for `read` from `$app/server`
 <div class="ts-block-property">
 
 ```dts
-emulate?(): MaybePromise<Emulator>;
+emulate?: () => MaybePromise<Emulator>;
 ```
 
 <div class="ts-block-property-details">
 
 Creates an `Emulator`, which allows the adapter to influence the environment
-during dev, build and prerendering
+during dev, build and prerendering.
 
 </div>
 </div></div>
 
 ## AfterNavigate
 
-The argument passed to [`afterNavigate`](https://kit.svelte.dev/docs/modules#$app-navigation-afternavigate) callbacks.
+The argument passed to [`afterNavigate`](/docs/kit/$app-navigation#afterNavigate) callbacks.
 
 <div class="ts-block">
 
@@ -440,7 +497,7 @@ type: Exclude<NavigationType, 'leave'>;
 <div class="ts-block-property-details">
 
 The type of navigation:
-- `enter`: The app has hydrated
+- `enter`: The app has hydrated/started
 - `form`: The user submitted a `<form>`
 - `link`: Navigation was triggered by a link click
 - `goto`: Navigation was triggered by a `goto(...)` call or a redirect
@@ -482,7 +539,7 @@ type AwaitedActions<
 
 ## BeforeNavigate
 
-The argument passed to [`beforeNavigate`](https://kit.svelte.dev/docs/modules#$app-navigation-beforenavigate) callbacks.
+The argument passed to [`beforeNavigate`](/docs/kit/$app-navigation#beforeNavigate) callbacks.
 
 <div class="ts-block">
 
@@ -493,7 +550,7 @@ interface BeforeNavigate extends Navigation {/*…*/}
 <div class="ts-block-property">
 
 ```dts
-cancel(): void;
+cancel: () => void;
 ```
 
 <div class="ts-block-property-details">
@@ -530,7 +587,7 @@ Print messages to the console. `log.info` and `log.minor` are silent unless Vite
 <div class="ts-block-property">
 
 ```dts
-rimraf(dir: string): void;
+rimraf: (dir: string) => void;
 ```
 
 <div class="ts-block-property-details">
@@ -543,7 +600,7 @@ Remove `dir` and all its contents.
 <div class="ts-block-property">
 
 ```dts
-mkdirp(dir: string): void;
+mkdirp: (dir: string) => void;
 ```
 
 <div class="ts-block-property-details">
@@ -595,7 +652,7 @@ An array of all routes (including prerendered)
 <div class="ts-block-property">
 
 ```dts
-createEntries(fn: (route: RouteDefinition) => AdapterEntry): Promise<void>;
+createEntries: (fn: (route: RouteDefinition) => AdapterEntry) => Promise<void>;
 ```
 
 <div class="ts-block-property-details">
@@ -615,7 +672,7 @@ Create separate functions that map to one or more routes of your app.
 <div class="ts-block-property">
 
 ```dts
-findServerAssets(routes: RouteDefinition[]): string[];
+findServerAssets: (routes: RouteDefinition[]) => string[];
 ```
 
 <div class="ts-block-property-details">
@@ -628,7 +685,7 @@ Find all the assets imported by server files belonging to `routes`
 <div class="ts-block-property">
 
 ```dts
-generateFallback(dest: string): Promise<void>;
+generateFallback: (dest: string) => Promise<void>;
 ```
 
 <div class="ts-block-property-details">
@@ -641,7 +698,7 @@ Generate a fallback page for a static webserver to use when no route is matched.
 <div class="ts-block-property">
 
 ```dts
-generateEnvModule(): void;
+generateEnvModule: () => void;
 ```
 
 <div class="ts-block-property-details">
@@ -654,7 +711,7 @@ Generate a module exposing build-time environment variables as `$env/dynamic/pub
 <div class="ts-block-property">
 
 ```dts
-generateManifest(opts: { relativePath: string; routes?: RouteDefinition[] }): string;
+generateManifest: (opts: { relativePath: string; routes?: RouteDefinition[] }) => string;
 ```
 
 <div class="ts-block-property-details">
@@ -665,7 +722,7 @@ generateManifest(opts: { relativePath: string; routes?: RouteDefinition[] }): st
 
 </div>
 
-Generate a server-side manifest to initialise the SvelteKit [server](https://kit.svelte.dev/docs/types#public-types-server) with.
+Generate a server-side manifest to initialise the SvelteKit [server](/docs/kit/@sveltejs-kit#Server) with.
 
 </div>
 </div>
@@ -673,7 +730,7 @@ Generate a server-side manifest to initialise the SvelteKit [server](https://kit
 <div class="ts-block-property">
 
 ```dts
-getBuildDirectory(name: string): string;
+getBuildDirectory: (name: string) => string;
 ```
 
 <div class="ts-block-property-details">
@@ -692,7 +749,7 @@ Resolve a path to the `name` directory inside `outDir`, e.g. `/path/to/.svelte-k
 <div class="ts-block-property">
 
 ```dts
-getClientDirectory(): string;
+getClientDirectory: () => string;
 ```
 
 <div class="ts-block-property-details">
@@ -705,7 +762,7 @@ Get the fully resolved path to the directory containing client-side assets, incl
 <div class="ts-block-property">
 
 ```dts
-getServerDirectory(): string;
+getServerDirectory: () => string;
 ```
 
 <div class="ts-block-property-details">
@@ -718,7 +775,7 @@ Get the fully resolved path to the directory containing server-side code.
 <div class="ts-block-property">
 
 ```dts
-getAppPath(): string;
+getAppPath: () => string;
 ```
 
 <div class="ts-block-property-details">
@@ -731,7 +788,7 @@ Get the application path including any configured `base` path, e.g. `my-base-pat
 <div class="ts-block-property">
 
 ```dts
-writeClient(dest: string): string[];
+writeClient: (dest: string) => string[];
 ```
 
 <div class="ts-block-property-details">
@@ -751,7 +808,7 @@ Write client assets to `dest`.
 <div class="ts-block-property">
 
 ```dts
-writePrerendered(dest: string): string[];
+writePrerendered: (dest: string) => string[];
 ```
 
 <div class="ts-block-property-details">
@@ -771,7 +828,7 @@ Write prerendered files to `dest`.
 <div class="ts-block-property">
 
 ```dts
-writeServer(dest: string): string[];
+writeServer: (dest: string) => string[];
 ```
 
 <div class="ts-block-property-details">
@@ -791,14 +848,14 @@ Write server-side code to `dest`.
 <div class="ts-block-property">
 
 ```dts
-copy(
+copy: (
 	from: string,
 	to: string,
 	opts?: {
 		filter?(basename: string): boolean;
 		replace?: Record<string, string>;
 	}
-): string[];
+) => string[];
 ```
 
 <div class="ts-block-property-details">
@@ -821,7 +878,7 @@ Copy a file or directory.
 <div class="ts-block-property">
 
 ```dts
-compress(directory: string): Promise<void>;
+compress: (directory: string) => Promise<void>;
 ```
 
 <div class="ts-block-property-details">
@@ -836,6 +893,24 @@ Compress files in `directory` with gzip and brotli, where appropriate. Generates
 
 </div>
 </div></div>
+
+## ClientInit
+
+<blockquote class="since note">
+
+Available since 2.10.0
+
+</blockquote>
+
+The [`init`](/docs/kit/hooks#Shared-hooks-init) will be invoked once the app starts in the browser
+
+<div class="ts-block">
+
+```dts
+type ClientInit = () => MaybePromise<void>;
+```
+
+</div>
 
 ## Config
 
@@ -852,7 +927,7 @@ interface Cookies {/*…*/}
 <div class="ts-block-property">
 
 ```dts
-get(name: string, opts?: import('cookie').CookieParseOptions): string | undefined;
+get: (name: string, opts?: import('cookie').CookieParseOptions) => string | undefined;
 ```
 
 <div class="ts-block-property-details">
@@ -872,7 +947,7 @@ Gets a cookie that was previously set with `cookies.set`, or from the request he
 <div class="ts-block-property">
 
 ```dts
-getAll(opts?: import('cookie').CookieParseOptions): Array<{ name: string; value: string }>;
+getAll: (opts?: import('cookie').CookieParseOptions) => Array<{ name: string; value: string }>;
 ```
 
 <div class="ts-block-property-details">
@@ -891,11 +966,11 @@ Gets all cookies that were previously set with `cookies.set`, or from the reques
 <div class="ts-block-property">
 
 ```dts
-set(
+set: (
 	name: string,
 	value: string,
 	opts: import('cookie').CookieSerializeOptions & { path: string }
-): void;
+) => void;
 ```
 
 <div class="ts-block-property-details">
@@ -920,7 +995,7 @@ You must specify a `path` for the cookie. In most cases you should explicitly se
 <div class="ts-block-property">
 
 ```dts
-delete(name: string, opts: import('cookie').CookieSerializeOptions & { path: string }): void;
+delete: (name: string, opts: import('cookie').CookieSerializeOptions & { path: string }) => void;
 ```
 
 <div class="ts-block-property-details">
@@ -942,11 +1017,11 @@ You must specify a `path` for the cookie. In most cases you should explicitly se
 <div class="ts-block-property">
 
 ```dts
-serialize(
+serialize: (
 	name: string,
 	value: string,
 	opts: import('cookie').CookieSerializeOptions & { path: string }
-): string;
+) => string;
 ```
 
 <div class="ts-block-property-details">
@@ -994,8 +1069,8 @@ and returns an `App.Platform` object
 
 ## Handle
 
-The [`handle`](https://kit.svelte.dev/docs/hooks#Server-hooks-handle) hook runs every time the SvelteKit server receives a [request](https://kit.svelte.dev/docs/web-standards#Fetch-APIs-Request) and
-determines the [response](https://kit.svelte.dev/docs/web-standards#Fetch-APIs-Response).
+The [`handle`](/docs/kit/hooks#Server-hooks-handle) hook runs every time the SvelteKit server receives a [request](/docs/kit/web-standards#Fetch-APIs-Request) and
+determines the [response](/docs/kit/web-standards#Fetch-APIs-Response).
 It receives an `event` object representing the request and a function called `resolve`, which renders the route and generates a `Response`.
 This allows you to modify response headers or bodies, or bypass SvelteKit entirely (for implementing routes programmatically, for example).
 
@@ -1004,10 +1079,10 @@ This allows you to modify response headers or bodies, or bypass SvelteKit entire
 ```dts
 type Handle = (input: {
 	event: RequestEvent;
-	resolve(
+	resolve: (
 		event: RequestEvent,
 		opts?: ResolveOptions
-	): MaybePromise<Response>;
+	) => MaybePromise<Response>;
 }) => MaybePromise<Response>;
 ```
 
@@ -1015,7 +1090,7 @@ type Handle = (input: {
 
 ## HandleClientError
 
-The client-side [`handleError`](https://kit.svelte.dev/docs/hooks#shared-hooks-handleError) hook runs when an unexpected error is thrown while navigating.
+The client-side [`handleError`](/docs/kit/hooks#Shared-hooks-handleError) hook runs when an unexpected error is thrown while navigating.
 
 If an unexpected error is thrown during loading or the following render, this function will be called with the error and the event.
 Make sure that this function _never_ throws an error.
@@ -1035,7 +1110,7 @@ type HandleClientError = (input: {
 
 ## HandleFetch
 
-The [`handleFetch`](https://kit.svelte.dev/docs/hooks#server-hooks-handleFetch) hook allows you to modify (or replace) a `fetch` request that happens inside a `load` function that runs on the server (or during pre-rendering)
+The [`handleFetch`](/docs/kit/hooks#Server-hooks-handleFetch) hook allows you to modify (or replace) a `fetch` request that happens inside a `load` function that runs on the server (or during prerendering).
 
 <div class="ts-block">
 
@@ -1051,7 +1126,7 @@ type HandleFetch = (input: {
 
 ## HandleServerError
 
-The server-side [`handleError`](https://kit.svelte.dev/docs/hooks#shared-hooks-handleError) hook runs when an unexpected error is thrown while responding to a request.
+The server-side [`handleError`](/docs/kit/hooks#Shared-hooks-handleError) hook runs when an unexpected error is thrown while responding to a request.
 
 If an unexpected error is thrown during loading or rendering, this function will be called with the error and the event.
 Make sure that this function _never_ throws an error.
@@ -1071,7 +1146,7 @@ type HandleServerError = (input: {
 
 ## HttpError
 
-The object returned by the [`error`](https://kit.svelte.dev/docs/modules#sveltejs-kit-error) function.
+The object returned by the [`error`](/docs/kit/@sveltejs-kit#error) function.
 
 <div class="ts-block">
 
@@ -1126,7 +1201,7 @@ type LessThan<
 
 ## Load
 
-The generic form of `PageLoad` and `LayoutLoad`. You should import those from `./$types` (see [generated types](https://kit.svelte.dev/docs/types#generated-types))
+The generic form of `PageLoad` and `LayoutLoad`. You should import those from `./$types` (see [generated types](/docs/kit/types#Generated-types))
 rather than using `Load` directly.
 
 <div class="ts-block">
@@ -1158,7 +1233,7 @@ type Load<
 
 ## LoadEvent
 
-The generic form of `PageLoadEvent` and `LayoutLoadEvent`. You should import those from `./$types` (see [generated types](https://kit.svelte.dev/docs/types#generated-types))
+The generic form of `PageLoadEvent` and `LayoutLoadEvent`. You should import those from `./$types` (see [generated types](/docs/kit/types#Generated-types))
 rather than using `LoadEvent` directly.
 
 <div class="ts-block">
@@ -1193,10 +1268,10 @@ fetch: typeof fetch;
 - It can be used to make credentialed requests on the server, as it inherits the `cookie` and `authorization` headers for the page request.
 - It can make relative requests on the server (ordinarily, `fetch` requires a URL with an origin when used in a server context).
 - Internal requests (e.g. for `+server.js` routes) go directly to the handler function when running on the server, without the overhead of an HTTP call.
-- During server-side rendering, the response will be captured and inlined into the rendered HTML by hooking into the `text` and `json` methods of the `Response` object. Note that headers will _not_ be serialized, unless explicitly included via [`filterSerializedResponseHeaders`](https://kit.svelte.dev/docs/hooks#Server-hooks-handle)
+- During server-side rendering, the response will be captured and inlined into the rendered HTML by hooking into the `text` and `json` methods of the `Response` object. Note that headers will _not_ be serialized, unless explicitly included via [`filterSerializedResponseHeaders`](/docs/kit/hooks#Server-hooks-handle)
 - During hydration, the response will be read from the HTML, guaranteeing consistency and preventing an additional network request.
 
-You can learn more about making credentialed requests with cookies [here](https://kit.svelte.dev/docs/load#cookies)
+You can learn more about making credentialed requests with cookies [here](/docs/kit/load#Cookies)
 
 </div>
 </div>
@@ -1217,7 +1292,7 @@ Contains the data returned by the route's server `load` function (in `+layout.se
 <div class="ts-block-property">
 
 ```dts
-setHeaders(headers: Record<string, string>): void;
+setHeaders: (headers: Record<string, string>) => void;
 ```
 
 <div class="ts-block-property-details">
@@ -1242,7 +1317,7 @@ export async function load({ fetch, setHeaders }) {
 
 Setting the same header multiple times (even in separate `load` functions) is an error — you can only set a given header once.
 
-You cannot add a `set-cookie` header with `setHeaders` — use the [`cookies`](https://kit.svelte.dev/docs/types#public-types-cookies) API in a server-only `load` function instead.
+You cannot add a `set-cookie` header with `setHeaders` — use the [`cookies`](/docs/kit/@sveltejs-kit#Cookies) API in a server-only `load` function instead.
 
 `setHeaders` has no effect when a `load` function runs in the browser.
 
@@ -1252,7 +1327,7 @@ You cannot add a `set-cookie` header with `setHeaders` — use the [`cookies`](h
 <div class="ts-block-property">
 
 ```dts
-parent(): Promise<ParentData>;
+parent: () => Promise<ParentData>;
 ```
 
 <div class="ts-block-property-details">
@@ -1268,12 +1343,12 @@ Be careful not to introduce accidental waterfalls when using `await parent()`. I
 <div class="ts-block-property">
 
 ```dts
-depends(...deps: Array<`${string}:${string}`>): void;
+depends: (...deps: Array<`${string}:${string}`>) => void;
 ```
 
 <div class="ts-block-property-details">
 
-This function declares that the `load` function has a _dependency_ on one or more URLs or custom identifiers, which can subsequently be used with [`invalidate()`](https://kit.svelte.dev/docs/modules#$app-navigation-invalidate) to cause `load` to rerun.
+This function declares that the `load` function has a _dependency_ on one or more URLs or custom identifiers, which can subsequently be used with [`invalidate()`](/docs/kit/$app-navigation#invalidate) to cause `load` to rerun.
 
 Most of the time you won't need this, as `fetch` calls `depends` on your behalf — it's only necessary if you're using a custom API client that bypasses `fetch`.
 
@@ -1299,7 +1374,7 @@ export async function load({ depends }) {
 <script>
 	import { invalidate } from '$app/navigation';
 
-	export let data;
+	let { data } = $props();
 
 	const increase = async () => {
 		await invalidate('increase:count');
@@ -1316,7 +1391,7 @@ export async function load({ depends }) {
 <div class="ts-block-property">
 
 ```dts
-untrack<T>(fn: () => T): T;
+untrack: <T>(fn: () => T) => T;
 ```
 
 <div class="ts-block-property-details">
@@ -1489,7 +1564,7 @@ id: RouteId;
 
 <div class="ts-block-property-details">
 
-The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`
+The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`. It is `null` when no route is matched.
 
 </div>
 </div></div>
@@ -1537,12 +1612,25 @@ Is `null` if the target is not part of the SvelteKit app (could not be resolved 
 <div class="ts-block-property">
 
 ```dts
-route: { id: string | null };
+route: {/*…*/}
 ```
 
 <div class="ts-block-property-details">
 
 Info about the target route
+
+<div class="ts-block-property-children"><div class="ts-block-property">
+
+```dts
+id: string | null;
+```
+
+<div class="ts-block-property-details">
+
+The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`. It is `null` when no route is matched.
+
+</div>
+</div></div>
 
 </div>
 </div>
@@ -1562,7 +1650,7 @@ The URL that is navigated to
 
 ## NavigationType
 
-- `enter`: The app has hydrated
+- `enter`: The app has hydrated/started
 - `form`: The user submitted a `<form>` with a GET method
 - `leave`: The user is leaving the app by closing the tab or using the back/forward buttons to go to a different document
 - `link`: Navigation was triggered by a link click
@@ -1598,7 +1686,7 @@ type NumericRange<
 
 ## OnNavigate
 
-The argument passed to [`onNavigate`](https://kit.svelte.dev/docs/modules#$app-navigation-onnavigate) callbacks.
+The argument passed to [`onNavigate`](/docs/kit/$app-navigation#onNavigate) callbacks.
 
 <div class="ts-block">
 
@@ -1638,7 +1726,7 @@ Since `onNavigate` callbacks are called immediately before a client-side navigat
 
 ## Page
 
-The shape of the `$page` store
+The shape of the [`page`](/docs/kit/$app-state#page) reactive object and the [`$page`](/docs/kit/$app-stores) store.
 
 <div class="ts-block">
 
@@ -1660,7 +1748,7 @@ url: URL;
 
 <div class="ts-block-property-details">
 
-The URL of the current page
+The URL of the current page.
 
 </div>
 </div>
@@ -1673,7 +1761,7 @@ params: Params;
 
 <div class="ts-block-property-details">
 
-The parameters of the current page - e.g. for a route like `/blog/[slug]`, a `{ slug: string }` object
+The parameters of the current page - e.g. for a route like `/blog/[slug]`, a `{ slug: string }` object.
 
 </div>
 </div>
@@ -1686,7 +1774,7 @@ route: {/*…*/}
 
 <div class="ts-block-property-details">
 
-Info about the current route
+Info about the current route.
 
 <div class="ts-block-property-children"><div class="ts-block-property">
 
@@ -1696,7 +1784,7 @@ id: RouteId;
 
 <div class="ts-block-property-details">
 
-The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`
+The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`. It is `null` when no route is matched.
 
 </div>
 </div></div>
@@ -1712,7 +1800,7 @@ status: number;
 
 <div class="ts-block-property-details">
 
-Http status code of the current page
+HTTP status code of the current page.
 
 </div>
 </div>
@@ -1751,7 +1839,7 @@ state: App.PageState;
 
 <div class="ts-block-property-details">
 
-The page state, which can be manipulated using the [`pushState`](https://kit.svelte.dev/docs/modules#$app-navigation-pushstate) and [`replaceState`](https://kit.svelte.dev/docs/modules#$app-navigation-replacestate) functions from `$app/navigation`.
+The page state, which can be manipulated using the [`pushState`](/docs/kit/$app-navigation#pushState) and [`replaceState`](/docs/kit/$app-navigation#replaceState) functions from `$app/navigation`.
 
 </div>
 </div>
@@ -1764,14 +1852,14 @@ form: any;
 
 <div class="ts-block-property-details">
 
-Filled only after a form submission. See [form actions](https://kit.svelte.dev/docs/form-actions) for more info.
+Filled only after a form submission. See [form actions](/docs/kit/form-actions) for more info.
 
 </div>
 </div></div>
 
 ## ParamMatcher
 
-The shape of a param matcher. See [matching](https://kit.svelte.dev/docs/advanced-routing#matching) for more info.
+The shape of a param matcher. See [matching](/docs/kit/advanced-routing#Matching) for more info.
 
 <div class="ts-block">
 
@@ -1793,7 +1881,7 @@ type PrerenderOption = boolean | 'auto';
 
 ## Redirect
 
-The object returned by the [`redirect`](https://kit.svelte.dev/docs/modules#sveltejs-kit-redirect) function
+The object returned by the [`redirect`](/docs/kit/@sveltejs-kit#redirect) function.
 
 <div class="ts-block">
 
@@ -1866,10 +1954,10 @@ fetch: typeof fetch;
 - It can be used to make credentialed requests on the server, as it inherits the `cookie` and `authorization` headers for the page request.
 - It can make relative requests on the server (ordinarily, `fetch` requires a URL with an origin when used in a server context).
 - Internal requests (e.g. for `+server.js` routes) go directly to the handler function when running on the server, without the overhead of an HTTP call.
-- During server-side rendering, the response will be captured and inlined into the rendered HTML by hooking into the `text` and `json` methods of the `Response` object. Note that headers will _not_ be serialized, unless explicitly included via [`filterSerializedResponseHeaders`](https://kit.svelte.dev/docs/hooks#Server-hooks-handle)
+- During server-side rendering, the response will be captured and inlined into the rendered HTML by hooking into the `text` and `json` methods of the `Response` object. Note that headers will _not_ be serialized, unless explicitly included via [`filterSerializedResponseHeaders`](/docs/kit/hooks#Server-hooks-handle)
 - During hydration, the response will be read from the HTML, guaranteeing consistency and preventing an additional network request.
 
-You can learn more about making credentialed requests with cookies [here](https://kit.svelte.dev/docs/load#cookies)
+You can learn more about making credentialed requests with cookies [here](/docs/kit/load#Cookies).
 
 </div>
 </div>
@@ -1877,7 +1965,7 @@ You can learn more about making credentialed requests with cookies [here](https:
 <div class="ts-block-property">
 
 ```dts
-getClientAddress(): string;
+getClientAddress: () => string;
 ```
 
 <div class="ts-block-property-details">
@@ -1895,7 +1983,7 @@ locals: App.Locals;
 
 <div class="ts-block-property-details">
 
-Contains custom data that was added to the request within the [`handle hook`](https://kit.svelte.dev/docs/hooks#Server-hooks-handle).
+Contains custom data that was added to the request within the [`server handle hook`](/docs/kit/hooks#Server-hooks-handle).
 
 </div>
 </div>
@@ -1908,7 +1996,7 @@ params: Params;
 
 <div class="ts-block-property-details">
 
-The parameters of the current route - e.g. for a route like `/blog/[slug]`, a `{ slug: string }` object
+The parameters of the current route - e.g. for a route like `/blog/[slug]`, a `{ slug: string }` object.
 
 </div>
 </div>
@@ -1934,7 +2022,7 @@ request: Request;
 
 <div class="ts-block-property-details">
 
-The original request object
+The original request object.
 
 </div>
 </div>
@@ -1947,7 +2035,7 @@ route: {/*…*/}
 
 <div class="ts-block-property-details">
 
-Info about the current route
+Info about the current route.
 
 <div class="ts-block-property-children"><div class="ts-block-property">
 
@@ -1957,7 +2045,7 @@ id: RouteId;
 
 <div class="ts-block-property-details">
 
-The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`
+The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/blog/[slug]`. It is `null` when no route is matched.
 
 </div>
 </div></div>
@@ -1968,7 +2056,7 @@ The ID of the current route - e.g. for `src/routes/blog/[slug]`, it would be `/b
 <div class="ts-block-property">
 
 ```dts
-setHeaders(headers: Record<string, string>): void;
+setHeaders: (headers: Record<string, string>) => void;
 ```
 
 <div class="ts-block-property-details">
@@ -1993,7 +2081,7 @@ export async function load({ fetch, setHeaders }) {
 
 Setting the same header multiple times (even in separate `load` functions) is an error — you can only set a given header once.
 
-You cannot add a `set-cookie` header with `setHeaders` — use the [`cookies`](https://kit.svelte.dev/docs/types#public-types-cookies) API instead.
+You cannot add a `set-cookie` header with `setHeaders` — use the [`cookies`](/docs/kit/@sveltejs-kit#Cookies) API instead.
 
 </div>
 </div>
@@ -2042,7 +2130,7 @@ isSubRequest: boolean;
 
 A `(event: RequestEvent) => Response` function exported from a `+server.js` file that corresponds to an HTTP verb (`GET`, `PUT`, `PATCH`, etc) and handles requests with that method.
 
-It receives `Params` as the first generic argument, which you can skip by using [generated types](https://kit.svelte.dev/docs/types#generated-types) instead.
+It receives `Params` as the first generic argument, which you can skip by using [generated types](/docs/kit/types#Generated-types) instead.
 
 <div class="ts-block">
 
@@ -2067,12 +2155,15 @@ Available since 2.3.0
 
 </blockquote>
 
-The [`reroute`](https://kit.svelte.dev/docs/hooks#universal-hooks-reroute) hook allows you to modify the URL before it is used to determine which route to render.
+The [`reroute`](/docs/kit/hooks#Universal-hooks-reroute) hook allows you to modify the URL before it is used to determine which route to render.
 
 <div class="ts-block">
 
 ```dts
-type Reroute = (event: { url: URL }) => void | string;
+type Reroute = (event: {
+	url: URL;
+	fetch: typeof fetch;
+}) => MaybePromise<void | string>;
 ```
 
 </div>
@@ -2088,7 +2179,7 @@ interface ResolveOptions {/*…*/}
 <div class="ts-block-property">
 
 ```dts
-transformPageChunk?(input: { html: string; done: boolean }): MaybePromise<string | undefined>;
+transformPageChunk?: (input: { html: string; done: boolean }) => MaybePromise<string | undefined>;
 ```
 
 <div class="ts-block-property-details">
@@ -2109,7 +2200,7 @@ but they will always be split at sensible boundaries such as `%sveltekit.head%` 
 <div class="ts-block-property">
 
 ```dts
-filterSerializedResponseHeaders?(name: string, value: string): boolean;
+filterSerializedResponseHeaders?: (name: string, value: string) => boolean;
 ```
 
 <div class="ts-block-property-details">
@@ -2130,7 +2221,7 @@ By default, none will be included.
 <div class="ts-block-property">
 
 ```dts
-preload?(input: { type: 'font' | 'css' | 'js' | 'asset'; path: string }): boolean;
+preload?: (input: { type: 'font' | 'css' | 'js' | 'asset'; path: string }) => boolean;
 ```
 
 <div class="ts-block-property-details">
@@ -2263,7 +2354,11 @@ appPath: string;
 assets: Set<string>;
 ```
 
-<div class="ts-block-property-details"></div>
+<div class="ts-block-property-details">
+
+Static files from `kit.config.files.assets` and the service worker (if any).
+
+</div>
 </div>
 
 <div class="ts-block-property">
@@ -2312,7 +2407,15 @@ routes: SSRRoute[];
 <div class="ts-block-property">
 
 ```dts
-matchers(): Promise<Record<string, ParamMatcher>>;
+prerendered_routes: Set<string>;
+```
+
+<div class="ts-block-property-details"></div>
+</div>
+<div class="ts-block-property">
+
+```dts
+matchers: () => Promise<Record<string, ParamMatcher>>;
 ```
 
 <div class="ts-block-property-details"></div>
@@ -2325,13 +2428,31 @@ server_assets: Record<string, number>;
 
 <div class="ts-block-property-details">
 
-A `[file]: size` map of all assets imported by server code
+A `[file]: size` map of all assets imported by server code.
 
 </div>
 </div></div>
 
 </div>
 </div></div>
+
+## ServerInit
+
+<blockquote class="since note">
+
+Available since 2.10.0
+
+</blockquote>
+
+The [`init`](/docs/kit/hooks#Shared-hooks-init) will be invoked before the server responds to its first request
+
+<div class="ts-block">
+
+```dts
+type ServerInit = () => MaybePromise<void>;
+```
+
+</div>
 
 ## ServerInitOptions
 
@@ -2349,7 +2470,7 @@ env: Record<string, string>;
 
 <div class="ts-block-property-details">
 
-A map of environment variables
+A map of environment variables.
 
 </div>
 </div>
@@ -2362,14 +2483,14 @@ read?: (file: string) => ReadableStream;
 
 <div class="ts-block-property-details">
 
-A function that turns an asset filename into a `ReadableStream`. Required for the `read` export from `$app/server` to work
+A function that turns an asset filename into a `ReadableStream`. Required for the `read` export from `$app/server` to work.
 
 </div>
 </div></div>
 
 ## ServerLoad
 
-The generic form of `PageServerLoad` and `LayoutServerLoad`. You should import those from `./$types` (see [generated types](https://kit.svelte.dev/docs/types#generated-types))
+The generic form of `PageServerLoad` and `LayoutServerLoad`. You should import those from `./$types` (see [generated types](/docs/kit/types#Generated-types))
 rather than using `ServerLoad` directly.
 
 <div class="ts-block">
@@ -2415,7 +2536,7 @@ interface ServerLoadEvent<
 <div class="ts-block-property">
 
 ```dts
-parent(): Promise<ParentData>;
+parent: () => Promise<ParentData>;
 ```
 
 <div class="ts-block-property-details">
@@ -2430,12 +2551,12 @@ Be careful not to introduce accidental waterfalls when using `await parent()`. I
 <div class="ts-block-property">
 
 ```dts
-depends(...deps: string[]): void;
+depends: (...deps: string[]) => void;
 ```
 
 <div class="ts-block-property-details">
 
-This function declares that the `load` function has a _dependency_ on one or more URLs or custom identifiers, which can subsequently be used with [`invalidate()`](https://kit.svelte.dev/docs/modules#$app-navigation-invalidate) to cause `load` to rerun.
+This function declares that the `load` function has a _dependency_ on one or more URLs or custom identifiers, which can subsequently be used with [`invalidate()`](/docs/kit/$app-navigation#invalidate) to cause `load` to rerun.
 
 Most of the time you won't need this, as `fetch` calls `depends` on your behalf — it's only necessary if you're using a custom API client that bypasses `fetch`.
 
@@ -2461,7 +2582,7 @@ export async function load({ depends }) {
 <script>
 	import { invalidate } from '$app/navigation';
 
-	export let data;
+	let { data } = $props();
 
 	const increase = async () => {
 		await invalidate('increase:count');
@@ -2478,7 +2599,7 @@ export async function load({ depends }) {
 <div class="ts-block-property">
 
 ```dts
-untrack<T>(fn: () => T): T;
+untrack: <T>(fn: () => T) => T;
 ```
 
 <div class="ts-block-property-details">
@@ -2545,7 +2666,7 @@ type SubmitFunction<
 	formElement: HTMLFormElement;
 	controller: AbortController;
 	submitter: HTMLElement | null;
-	cancel(): void;
+	cancel: () => void;
 }) => MaybePromise<
 	| void
 	| ((opts: {
@@ -2558,15 +2679,87 @@ type SubmitFunction<
 			 * @param options Set `reset: false` if you don't want the `<form>` values to be reset after a successful submission.
 			 * @param invalidateAll Set `invalidateAll: false` if you don't want the action to call `invalidateAll` after submission.
 			 */
-			update(options?: {
+			update: (options?: {
 				reset?: boolean;
 				invalidateAll?: boolean;
-			}): Promise<void>;
-	  }) => void)
+			}) => Promise<void>;
+	  }) => MaybePromise<void>)
 >;
 ```
 
 </div>
+
+## Transport
+
+<blockquote class="since note">
+
+Available since 2.11.0
+
+</blockquote>
+
+The [`transport`](/docs/kit/hooks#Universal-hooks-transport) hook allows you to transport custom types across the server/client boundary.
+
+Each transporter has a pair of `encode` and `decode` functions. On the server, `encode` determines whether a value is an instance of the custom type and, if so, returns a non-falsy encoding of the value which can be an object or an array (or `false` otherwise).
+
+In the browser, `decode` turns the encoding back into an instance of the custom type.
+
+```ts
+import type { Transport } from '@sveltejs/kit';
+
+declare class MyCustomType {
+	data: any
+}
+
+// hooks.js
+export const transport: Transport = {
+	MyCustomType: {
+		encode: (value) => value instanceof MyCustomType && [value.data],
+		decode: ([data]) => new MyCustomType(data)
+	}
+};
+```
+
+<div class="ts-block">
+
+```dts
+type Transport = Record<string, Transporter>;
+```
+
+</div>
+
+## Transporter
+
+A member of the [`transport`](/docs/kit/hooks#Universal-hooks-transport) hook.
+
+<div class="ts-block">
+
+```dts
+interface Transporter<
+	T = any,
+	U = Exclude<
+		any,
+		false | 0 | '' | null | undefined | typeof NaN
+	>
+> {/*…*/}
+```
+
+<div class="ts-block-property">
+
+```dts
+encode: (value: T) => false | U;
+```
+
+<div class="ts-block-property-details"></div>
+</div>
+
+<div class="ts-block-property">
+
+```dts
+decode: (data: U) => T;
+```
+
+<div class="ts-block-property-details"></div>
+</div></div>
 
 
 

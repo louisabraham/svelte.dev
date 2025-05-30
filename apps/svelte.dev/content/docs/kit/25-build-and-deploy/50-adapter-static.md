@@ -39,7 +39,7 @@ export default {
 export const prerender = true;
 ```
 
-> [!NOTE] You must ensure SvelteKit's [`trailingSlash`](page-options#trailingSlash) option is set appropriately for your environment. If your host does not render `/a.html` upon receiving a request for `/a` then you will need to set `trailingSlash: 'always'` in your root layout to create `/a/index.html` instead.
+> You must ensure SvelteKit's [`trailingSlash`](page-options#trailingslash) option is set appropriately for your environment. If your host does not render `/a.html` upon receiving a request for `/a` then you will need to set `trailingSlash: 'always'` in your root layout to create `/a/index.html` instead.
 
 ## Zero-config support
 
@@ -49,12 +49,12 @@ Some platforms have zero-config support (more to come in future):
 
 On these platforms, you should omit the adapter options so that `adapter-static` can provide the optimal configuration:
 
-```js
-// @errors: 2304
+```diff
 /// file: svelte.config.js
 export default {
 	kit: {
-		adapter: adapter(---{...}---)
+-		adapter: adapter({...})
++		adapter: adapter()
 	}
 };
 ```
@@ -124,18 +124,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       # If you're using pnpm, add this step then change the commands and cache key below to use `pnpm`
       # - name: Install pnpm
-      #   uses: pnpm/action-setup@v3
+      #   uses: pnpm/action-setup@v2
       #   with:
       #     version: 8
 
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 18
           cache: npm
 
       - name: Install dependencies
@@ -148,7 +148,7 @@ jobs:
           npm run build
 
       - name: Upload Artifacts
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v2
         with:
           # this should match the `pages` option in your adapter-static options
           path: 'build/'
@@ -168,7 +168,7 @@ jobs:
     steps:
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v2
 ```
 
 If you're not using GitHub actions to deploy your site (for example, you're pushing the built site to its own repo), add an empty `.nojekyll` file in your `static` directory to prevent Jekyll from interfering.

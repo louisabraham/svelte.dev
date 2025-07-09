@@ -45,6 +45,9 @@ const empty = {
 
 function ts_blank_space(context: Context<any, { ms: MagicString }>, node: any): void {
 	const { start, end } = node;
+	if (!context.state.ms.toString().slice(start, end).trim()) {
+		return;
+	}
 	let i = start;
 	while (i < end) {
 		// Skip whitespace
